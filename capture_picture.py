@@ -100,8 +100,11 @@ Setup software
 $ lsusb
 Bus 001 Device 009: ID 32e4:9230 HD USB Camera HD USB Camera
 
+$ ffplay /dev/video0
+
 $ pip3 install ultralytics
 
 $ pip3 install google-cloud-storage
+
 
 """
