@@ -1,0 +1,56 @@
+# (c) jag.m.singh@gmail.com
+# Plane Spotter configuration.
+#
+# location /etc/plane-spotter/config.yaml:
+# Override the location with the PLANE_SPOTTER_CONFIG environment variable.
+#
+# --- ADS-B input ---------------------------------------------------------
+# Written by dump1090-mutability on the host. dump1090 is NOT containerized
+# (it needs kernel driver blacklisting + udev rules); the container reads
+# this file over a read-only bind mount.
+dump1090_file: /var/run/dump1090-mutability/aircraft.json
+
+# --- Monitored airspace --------------------------------------------------
+# The box that triggers a capture when an aircraft enters it.
+#
+# define this to cover ONE approach corridor only. 
+# If the logs start warning about multiple new aircraft in one poll window,
+# the bounds have crept into an adjacent corridor and need tightening.
+monitored_space:
+  lower_lat: 33.00
+  upper_lat: 33.20
+  lower_lon: -97.20
+  upper_lon: -97.00
+  lower_altitude: 1000
+  upper_altitude: 5000
+
+# --- Output --------------------------------------------------------------
+# One HTML page per day is written here, then uploaded to the bucket.
+# The only directory the app writes to. chown to the user that
+# runs the container
+log_dir: /var/lib/plane-spotter/captured_planes
+
+# GCS service account with write access to the bucket. 
+credentials_file: /etc/plane-spotter/api-key.json
+bucket_name: your-bucket-name
+
+# --- Camera --------------------------------------------------------------
+# Pin the camera by its stable USB-ID path, NOT /dev/videoN, which shifts
+# across reboots when several cameras are attached:
+#   ls -l /dev/v4l/by-id/
+# Use the -video-index0 node (index0 = capture stream, index1 = UVC
+# metadata, which OpenCV cannot open).
+# Inside the container the compose file maps it to /dev/video0.
+video_source: /dev/video0
+
+# Seconds the camera watches after a radio trigger. The loop is inference-
+# bound (YOLO is slower than the frame rate), so this is also roughly how
+# long one CPU core stays busy per sighting.
+monitor_duration: 30
+
+# Seconds between reads of aircraft.json to prevent CPU thrashing
+poll_interval: 5
+
+# Live cv2.imshow preview window. Must stay false in Docker (no display).
+# Set true only for bare-metal debugging on a desktop session.
+show_preview: false
