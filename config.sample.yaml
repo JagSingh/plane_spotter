@@ -17,12 +17,14 @@ dump1090_file: /var/run/dump1090-mutability/aircraft.json
 # If the logs start warning about multiple new aircraft in one poll window,
 # the bounds have crept into an adjacent corridor and need tightening.
 monitored_space:
-  lower_lat: 33.00
-  upper_lat: 33.20
-  lower_lon: -97.20
-  upper_lon: -97.00
-  lower_altitude: 1000
-  upper_altitude: 5000
+  lower_lat: 0.00
+  upper_lat: 0.00
+  lower_lon: 0.00
+  upper_lon: 0.00
+  # Feet. Aircraft reporting "ground" are ignored automatically.
+  lower_altitude: 000
+  upper_altitude: 000
+
 
 # --- Output --------------------------------------------------------------
 # One HTML page per day is written here, then uploaded to the bucket.
