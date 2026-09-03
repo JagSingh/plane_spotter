@@ -2,10 +2,11 @@
 """Stub out hardware/cloud dependencies so unit tests run anywhere
 (no camera, no SDR, no GCS credentials, no YOLO download)."""
 
-import json
 import os
 import sys
 import tempfile
+
+import yaml
 from unittest.mock import MagicMock
 
 # --- stub heavy third-party modules before any project import ---
@@ -33,12 +34,16 @@ _config = {
     "bucket_name": "test-bucket",
     "poll_interval": 0,
 }
-_config_path = os.path.join(_tmpdir, "plane_spotter.json")
+_config_path = os.path.join(_tmpdir, "plane_spotter.yaml")
 with open(_config_path, "w") as f:
-    json.dump(_config, f)
+    yaml.safe_dump(_config, f)
+
+# get_config now checks that credentials_file exists; the GCS client itself
+# is mocked, so the contents are irrelevant — only the path must resolve.
+with open(_config["credentials_file"], "w") as f:
+    f.write("{}")
 
 os.environ["PLANE_SPOTTER_CONFIG"] = _config_path
-print(f"Using temp config file for tests: {os.environ['PLANE_SPOTTER_CONFIG']}")
 
 # make the project root importable
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
