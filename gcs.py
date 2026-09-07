@@ -1,15 +1,11 @@
 # (c) jag.m.singh@gmail.com
-"""Shared, lazily-created Google Cloud Storage bucket handle.
-
-Previously both capture_picture.py and create_document.py constructed a new
-storage.Client from the service-account JSON on every single upload. This
-creates the client once and reuses it.
+"""The client is created once - global - when the process starts
+and is used by both capture_picture.py and create_document.py 
 """
 
 import get_config
 
 _bucket = None
-
 
 def bucket():
     global _bucket
