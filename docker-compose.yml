@@ -1,4 +1,5 @@
 # (c) jag.m.singh@gmail.com
+name: plane-spotter
 services:
   plane-spotter:
     image: ghcr.io/jagsingh/plane_spotter:latest
