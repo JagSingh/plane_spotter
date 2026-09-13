@@ -1,10 +1,23 @@
+
 # (c) jag.m.singh@gmail.com
-# Pinned to the versions proven working. Bump deliberately.
+# Pinned to the versions proven working. Bump deliberately, 
+#
+# CPU-only torch. The default PyPI torch wheel bundles the full CUDA stack
+# (~2.5 GB of nvidia_* packages), which is dead weight on a CPU-only host.
+# This extra index carries CPU builds; pip prefers them for torch and
+# torchvision, so ultralytics finds torch already satisfied and does not
+# pull the CUDA build.
+--extra-index-url https://download.pytorch.org/whl/cpu
+ 
+torch==2.7.0+cpu
+torchvision==0.22.0+cpu
+ 
 ultralytics==8.3.124
 google-cloud-storage==3.1.0
 requests==2.32.3
 PyYAML==6.0.2
-# opencv is installed separately in the Dockerfile:
-# ultralytics pulls in opencv-python (GUI build), which is swapped for
-# opencv-python-headless inside the container. For bare-metal use with the
-# live preview window, `pip install opencv-python` yourself.
+ 
+# opencv is NOT listed here. ultralytics pulls in opencv-python (the GUI
+# build). The Dockerfile replaces it with opencv-python-headless so the
+# image needs no X11/libGL. For bare-metal use with the live preview
+# window, install the GUI build ultralytics.
