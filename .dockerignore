@@ -13,5 +13,6 @@ venv
 all_days.html
 config.sample.yaml
 docker-compose.yml
+pyproject.toml
 MIGRATION.md
 requirements-dev.txt
