@@ -1,0 +1,10 @@
+# (c) jag.m.singh@gmail.com
+# Pinned to the versions proven working. Bump deliberately.
+ultralytics==8.3.124
+google-cloud-storage==3.1.0
+requests==2.32.3
+PyYAML==6.0.2
+# opencv is installed separately in the Dockerfile:
+# ultralytics pulls in opencv-python (GUI build), which is swapped for
+# opencv-python-headless inside the container. For bare-metal use with the
+# live preview window, `pip install opencv-python` yourself.
