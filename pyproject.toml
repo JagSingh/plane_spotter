@@ -4,7 +4,7 @@
 #   E4/E7/E9  syntax errors
 #   F         Pyflakes: real bugs, unused imports, undefined names
 #
-# Not enabled, and why:
+# Not enabled:
 #   I    import ordering — cosmetic; auto-fixable with `ruff check --fix`
 #   SIM  style suggestions, example requiring `with open(...)` in tests
 #   DTZ  naive datetime warnings. These fire on the timestamps derived from
