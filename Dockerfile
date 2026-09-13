@@ -3,7 +3,7 @@
 
 # floating tag chosen so Debian security updates land on rebuild; 
 # pin by digest only if a base change ever breaks something
-FROM python:3.12-slim-bookworm
+FROM python:3.14-slim-bookworm
 
 # tzdata so datetime.fromtimestamp() renders CST, not UTC (TZ set in compose).
 # libglib2.0-0 is the one runtime lib opencv-python-headless needs.
