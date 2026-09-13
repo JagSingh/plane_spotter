@@ -1,0 +1,39 @@
+# (c) jag.m.singh@gmail.com
+# Opens a PR per available upgrade. Each PR runs through the CI workflow,
+# so lint + tests gate the bump before it can be merged and deployed.
+version: 2
+updates:
+  # Python dependencies in requirements.txt
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "deps"
+    groups:
+      # torch and friends move together; one PR rather than five.
+      ultralytics-stack:
+        patterns:
+          - "ultralytics"
+          - "torch*"
+          - "numpy"
+          - "pillow"
+
+  # Base image in the Dockerfile (python:3.12-slim-bookworm).
+  # Only fires on tag changes; if the FROM line is digest-pinned, this is
+  # what surfaces new digests.
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "docker"
+
+  # GitHub Actions versions in .github/workflows/ci.yml
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "ci"
