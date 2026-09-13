@@ -1,8 +1,8 @@
 # (c) jag.m.singh@gmail.com
 # Ruff configuration.
 #
-#   E4/E7/E9  syntax and import-shadowing errors
-#   F         Pyflakes — real bugs (unused imports, undefined names)
+#   E4/E7/E9  syntax errors
+#   F         Pyflakes: real bugs, unused imports, undefined names
 #
 # Not enabled, and why:
 #   I    import ordering — cosmetic; auto-fixable with `ruff check --fix`
