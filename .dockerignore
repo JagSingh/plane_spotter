@@ -14,3 +14,4 @@ all_days.html
 config.sample.yaml
 docker-compose.yml
 MIGRATION.md
+requirements-dev.txt
