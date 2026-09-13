@@ -1,0 +1,18 @@
+# (c) jag.m.singh@gmail.com
+# Ruff configuration.
+#
+#   E4/E7/E9  syntax errors
+#   F         Pyflakes: real bugs, unused imports, undefined names
+#
+# Not enabled:
+#   I    import ordering — cosmetic; auto-fixable with `ruff check --fix`
+#   SIM  style suggestions, example requiring `with open(...)` in tests
+#   DTZ  naive datetime warnings. These fire on the timestamps derived from
+#        dump1090's "now" field, which are deliberately rendered in local
+#        time for display. This surfaces a real issue:
+#        the repeated hour at DST fall-back produces
+#        duplicate photo filenames, since %Y%m%d%H%M%S carries no UTC
+#        offset. Making the datetimes tz-aware does NOT fix that, the
+#        filename format would have to change. Ignoring both for now.
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]

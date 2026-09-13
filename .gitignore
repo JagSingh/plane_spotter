@@ -1,0 +1,15 @@
+# (c) jag.m.singh@gmail.com
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+yolov8n.pt
+ 
+# the credential file is in /etc, this is standard ignore block to protect keys
+*api-key*.json
+*service-account*.json
+*credentials*.json
+.env
+ 

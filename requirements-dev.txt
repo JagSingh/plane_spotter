@@ -1,0 +1,5 @@
+# (c) jag.m.singh@gmail.com
+# Development tooling only, not installed in the Docker image.
+# Install with: pip install -r requirements.txt -r requirements-dev.txt
+ruff
+pytest

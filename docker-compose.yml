@@ -1,0 +1,52 @@
+# (c) jag.m.singh@gmail.com
+services:
+  plane-spotter:
+    image: ghcr.io/jagsingh/plane_spotter:latest
+    build:
+      context: .
+      args:
+        # must match the host owner of /var/lib/plane-spotter (id -u / id -g)
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    container_name: plane-spotter
+    restart: unless-stopped
+    environment:
+      TZ: America/Chicago               # keeps timestamps in CST/CDT
+      # Config is read from /etc/plane-spotter/config.yaml (mounted below).
+      # That path is the default in get_config.py and the ENV in the
+      # Dockerfile (nothing added here)
+    devices:
+      # USB camera pinned by USB ID (lsusb: 32e4:9230 HD USB Camera), not by
+      # enumeration order — /dev/videoN shifts across reboots/replugs.
+      # Confirm the exact stable path with:  ls -l /dev/v4l/by-id/
+      # (use the -video-index0 node: index0 = capture stream, index1 = UVC
+      # metadata, which OpenCV cannot open). Mapped to a fixed name inside
+      # the container, matching "video_source" in the config.
+      - /dev/v4l/by-id/usb-HD_USB_Camera_HD_USB_Camera-video-index0:/dev/video0
+      # Alternative: a udev rule, same pattern as the rtl-sdr.rules —
+      #   /etc/udev/rules.d/99-plane-camera.rules:
+      #   SUBSYSTEM=="video4linux", ATTRS{idVendor}=="32e4", \
+      #     ATTRS{idProduct}=="9230", ATTR{index}=="0", \
+      #     SYMLINK+="plane-camera", MODE="0666"
+      # then map:  - /dev/plane-camera:/dev/video0
+    volumes:
+      # dump1090 keeps running on the host; the container only reads its JSON
+      - /var/run/dump1090-mutability:/var/run/dump1090-mutability:ro
+      # Config + GCS key, read-only. Identical path on both sides.
+      # The whole directory is mounted (not individual files) so the key and
+      # config are managed as one unit. Deliberately outside the repo: a key
+      # in a git working tree eventually gets committed.
+      - /etc/plane-spotter:/etc/plane-spotter:ro
+      # Daily HTML output — the ONLY writable mount. Container UID must match
+      # this directory's owner on the host (see build args above).
+      - /var/lib/plane-spotter/captured_planes:/var/lib/plane-spotter/captured_planes
+    # group_add is a fallback if the image's 'video' group GID
+    # doesn't match the host's. Find the host GID with: getent group video
+    # Docker Debian should be 44 and Ubuntu host Debian is also 44, anyways:
+    group_add:
+      - "44"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
