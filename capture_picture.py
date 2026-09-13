@@ -105,16 +105,39 @@ def detect_and_upload_airplane(cst_time, aircraft_data=None,
 """
 Setup software (bare metal; the Docker image installs these itself)
 
-$ lsusb
+$ pip3 install -r requirements.txt
+
+Check that camera shows up
+lsusb
 Bus 001 Device 009: ID 32e4:9230 HD USB Camera HD USB Camera
 
-$ ffplay /dev/video0
+Test camera
+ffplay /dev/videoN
 
-$ pip3 install ultralytics
+Identify and pin the camera by its /dev/v4l/by-id/ path rather than
+/dev/videoN, which shifts across reboots when several cameras are attached.
+Each UVC camera exposes two nodes: the -video-index0 entry is the capture
+stream, -video-index1 is UVC metadata (timestamps, frame counters) which
+OpenCV cannot open. Match on the by-id name, not the video number — the
+numbering is allocation order and carries no meaning.
 
-$ pip3 install google-cloud-storage
+$ sudo apt install v4l-utils # ??
+$ ls -l /dev/v4l/by-id/
+usb-HD_USB_Camera_HD_USB_Camera-video-index0 -> ../../video2
 
-Note: pin the camera by its /dev/v4l/by-id/ path rather than /dev/videoN,
-which shifts across reboots when several cameras are attached. Use the
--video-index0 node; index1 is UVC metadata and OpenCV cannot open it.
+Confirm it's the right camera
+
+v4l2-ctl --device=/dev/v4l/by-id/usb-HD_USB_Camera_HD_USB_Camera-video-index0 --info
+ffplay /dev/v4l/by-id/usb-HD_USB_Camera_HD_USB_Camera-video-index0
+The --info should report the HD USB Camera, ffplay gives you a live window — confirm it's pointed at the sky.
+
+Update the config
+
+yaml
+video_source: /dev/v4l/by-id/usb-HD_USB_Camera_HD_USB_Camera-video-index0
+
+Docker note: the compose file maps by-id path to /dev/video0 inside the container, 
+so at docker run time the config value changes to /dev/video0 and the by-id path lives only in docker-compose.yml. 
+Bare metal uses the by-id path directly; containerized uses the mapping. Both end up on the same physical camera.
+
 """
