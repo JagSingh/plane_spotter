@@ -3,8 +3,8 @@ import os
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
-import get_config
 import create_document
+import get_config
 
 
 @patch("create_document.gcs")

@@ -5,9 +5,9 @@
 import os
 import sys
 import tempfile
+from unittest.mock import MagicMock
 
 import yaml
-from unittest.mock import MagicMock
 
 # --- stub heavy third-party modules before any project import ---
 for mod_name in ["cv2", "ultralytics", "google", "google.cloud",
