@@ -68,21 +68,3 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  deploy:
-    needs: build-and-push
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    # Self-hosted runner on the spotter laptop (SDR + camera attached).
-    # Until a runner is registered and online this job sits queued; the
-    # build above still publishes the image.
-    runs-on: [self-hosted, plane-spotter]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Pull latest image and restart
-        run: |
-          docker compose pull
-          docker compose up -d
-          docker image prune -f
-
-      - name: Show container state
-        run: docker compose ps
