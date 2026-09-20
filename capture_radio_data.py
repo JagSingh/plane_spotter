@@ -163,4 +163,43 @@ Plug / unplug usb device
 
 $ cat /var/run/dump1090-mutability/aircraft.json
 
+Receiver gain tuning
+
+GAIN="max" is the dump1090-mutability default and the front end saturates on 
+close aircraft near a busy airport, so most of what it
+demodulates is noise. Measured here at max gain: 680k Mode S attempts per
+minute, 59% CRC failures, 11k usable messages. At 29.7: 45k attempts,
+22% failures, 18k usable.
+
+Also set LAT/LON. Without a receiver position dump1090 must use global CPR
+decoding, which needs a matched even/odd message pair before it can report
+any position. With LAT/LON it decodes a position from a single message, so
+aircraft acquire sooner which determines whether they are still
+in the camera's view when the capture starts.
+
+1. Edit /etc/default/dump1090-mutability:
+       LAT="<antenna latitude>"
+       LON="<antenna longitude>"
+       GAIN="29.7"
+
+2. For each gain in 36.4, 29.7, 25.4, 20.7:
+       $ sudo systemctl restart dump1090-mutability
+       $ sleep 360                      # let the 5-minute window fill
+       $ python3 -c "
+         import json
+         s=json.load(open('/run/dump1090-mutability/stats.json'))['last5min']['local']
+         print(sum(s['accepted'])/5, round(100*s['bad']/s['modes'],1))"
+
+3. Pick the highest accepted/min. Use last5min, not last1min: traffic
+   arrives in banks and one-minute samples varied 40% at the same gain
+   here. Within ~10%, take the lower gain - less CPU, and headroom before
+   clipping on aircraft passing overhead.
+
+4. Sanity check rssi in aircraft.json. Close aircraft should read about
+   -10 to -30 dBFS. Values pinned near 0 mean clipping; values in a narrow
+   band regardless of range mean saturation.
+
+Verify what is actually running (the config file is not proof):
+    $ ps aux | grep dump1090 | grep -oE -- "--(gain|lat) [0-9.-]+"
+
 """
