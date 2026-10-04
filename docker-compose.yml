@@ -11,6 +11,8 @@ services:
         GID: ${GID:-1000}
     container_name: plane-spotter
     restart: unless-stopped
+    init: true
+    stop_grace_period: 20s
     environment:
       TZ: America/Chicago               # keeps timestamps in CST/CDT
       # Config is read from /etc/plane-spotter/config.yaml (mounted below).
