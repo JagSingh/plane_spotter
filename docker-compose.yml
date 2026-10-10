@@ -33,8 +33,13 @@ services:
       #     SYMLINK+="plane-camera", MODE="0666"
       # then map:  - /dev/plane-camera:/dev/video0
     volumes:
-      # dump1090 keeps running on the host; the container only reads its JSON
-      - /var/run/dump1090-mutability:/var/run/dump1090-mutability:ro
+      # readsb keeps running on the host; the container only reads its JSON.
+      # Mount the DIRECTORY, not aircraft.json: readsb replaces the file by
+      # rename every second, and a file bind mount pins the old inode.
+      # The host needs RuntimeDirectoryPreserve=yes on readsb.service (see
+      # capture_radio_data.py), or every readsb restart deletes /run/readsb
+      # and leaves this mount pointing at a dead directory.
+      - /run/readsb:/run/readsb:ro
       # Config + GCS key, read-only. Identical path on both sides.
       # The whole directory is mounted (not individual files) so the key and
       # config are managed as one unit. Deliberately outside the repo: a key

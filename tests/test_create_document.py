@@ -15,8 +15,8 @@ def test_update_html_file_creates_and_appends(mock_get, mock_gcs):
         raise_for_status=lambda: None)
 
     capture_time = datetime(2026, 7, 12, 15, 30, 45)
-    data = {"hex": "a0cbdb", "flight": "EJM108", "altitude": 3025,
-            "speed": 144, "vert_rate": -1024}
+    data = {"hex": "a0cbdb", "flight": "EJM108", "alt_baro": 3025,
+            "gs": 144, "baro_rate": -1024}
 
     create_document.update_html_file(capture_time, data, "20260712153045.jpg")
 
@@ -26,6 +26,10 @@ def test_update_html_file_creates_and_appends(mock_get, mock_gcs):
     assert "<!DOCTYPE html>" in content
     assert "MD-11 F" in content
     assert "20260712153045.jpg" in content
+    # readsb field names render (not "unknown")
+    assert "Altitude: 3025 feet" in content
+    assert "Speed: 144 knots" in content
+    assert "Vertical Speed: -1024 feet/min" in content
 
     # second sighting the same day appends without re-writing the header
     create_document.update_html_file(capture_time, data, "20260712160000.jpg")

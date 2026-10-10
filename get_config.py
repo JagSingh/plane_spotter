@@ -34,7 +34,7 @@ if not isinstance(config_dict, dict):
     raise SystemExit(f"Config file {config_file} must contain a YAML mapping.")
 
 monitored_space = config_dict.get("monitored_space", {})
-dump1090_file = config_dict.get("dump1090_file", "")
+adsb_file = config_dict.get("adsb_file", "")
 log_dir = os.path.expanduser(config_dict.get("log_dir", ""))
 credentials_file = os.path.expanduser(config_dict.get("credentials_file", ""))
 bucket_name = config_dict.get("bucket_name", "")
@@ -53,8 +53,8 @@ _required_space_keys = {
 _missing = _required_space_keys - set(monitored_space)
 if _missing:
     raise SystemExit(f"Config 'monitored_space' is missing keys: {sorted(_missing)}")
-if not dump1090_file:
-    raise SystemExit("Config is missing 'dump1090_file'.")
+if not adsb_file:
+    raise SystemExit("Config is missing 'adsb_file'.")
 if not log_dir:
     raise SystemExit("Config is missing 'log_dir'.")
 # These two are only used at upload time — i.e. AFTER a 30s capture has

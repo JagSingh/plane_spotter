@@ -23,7 +23,7 @@ print(f"Using temp dir for test logs: {_log_dir}")
 os.makedirs(_log_dir, exist_ok=True)
 
 _config = {
-    "dump1090_file": os.path.join(_tmpdir, "aircraft.json"),
+    "adsb_file": os.path.join(_tmpdir, "aircraft.json"),
     "monitored_space": {
         "lower_lat": 33.0, "upper_lat": 33.2,
         "lower_lon": -97.2, "upper_lon": -97.0,

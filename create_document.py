@@ -46,9 +46,9 @@ def update_html_file(capture_time, airplane_data, airplane_picture):
         f'Aircraft: {aircraft_hex} | '
         f'Type: {aircraft_type} | '
         f'Flight: {airplane_data.get("flight", "unknown")} | '
-        f'Altitude: {airplane_data.get("altitude", "unknown")} feet | '
-        f'Speed: {airplane_data.get("speed", "unknown")} knots | '
-        f'Vertical Speed: {airplane_data.get("vert_rate", "unknown")} feet/min'
+        f'Altitude: {airplane_data.get("alt_baro", "unknown")} feet | '
+        f'Speed: {airplane_data.get("gs", "unknown")} knots | '
+        f'Vertical Speed: {airplane_data.get("baro_rate", "unknown")} feet/min'
     )
     logger.info("Airplane data: %s", print_airplane_data)
 
@@ -82,28 +82,29 @@ def update_html_file(capture_time, airplane_data, airplane_picture):
 
 
 """
-aircraft.json
-This file contains dump1090's list of recently seen aircraft. The keys are:
+aircraft.json (readsb, /run/readsb/aircraft.json)
+Full reference: https://github.com/wiedehopf/readsb/blob/dev/README-json.md
+Fields this app uses:
 
 now: the time this file was generated, in seconds since the Unix epoch.
-messages: total Mode S messages processed since dump1090 started.
+messages: total Mode S messages processed since readsb started.
 aircraft: an array of JSON objects, one per known aircraft. Keys are omitted
 if data is not available:
 
     hex: the 24-bit ICAO identifier of the aircraft, as 6 hex digits. The
         identifier may start with '~', this means that the address is a
         non-ICAO address (e.g. from TIS-B).
-    squawk: the 4-digit squawk (octal representation)
+    type: source of the best data (adsb_icao, mlat, tisb_icao, ...). NOT
+        the aircraft type.
     flight: the flight name / callsign
+    category: emitter category (A0-D7)
     lat, lon: the aircraft position in decimal degrees
-    nucp: the NUCp (navigational uncertainty category) reported for the position
     seen_pos: how long ago (in seconds before "now") the position was last updated
-    altitude: the aircraft altitude in feet, or "ground" if it is reporting
-        it is on the ground
-    vert_rate: vertical rate in feet/minute
+    alt_baro: barometric altitude in feet, or "ground" if it is reporting
+        it is on the ground  (mutability: altitude)
+    gs: ground speed in knots  (mutability: speed)
+    baro_rate: barometric vertical rate in feet/minute  (mutability: vert_rate)
     track: true track over ground in degrees (0-359)
-    speed: reported speed in kt. This is usually speed over ground, but
-        might be IAS - you can't tell the difference here, sorry!
     messages: total number of Mode S messages received from this aircraft
     seen: how long ago (in seconds before "now") a message was last received
         from this aircraft

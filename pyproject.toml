@@ -8,7 +8,7 @@
 #   I    import ordering — cosmetic; auto-fixable with `ruff check --fix`
 #   SIM  style suggestions, example requiring `with open(...)` in tests
 #   DTZ  naive datetime warnings. These fire on the timestamps derived from
-#        dump1090's "now" field, which are deliberately rendered in local
+#        readsb's "now" field, which are deliberately rendered in local
 #        time for display. This surfaces a real issue:
 #        the repeated hour at DST fall-back produces
 #        duplicate photo filenames, since %Y%m%d%H%M%S carries no UTC
