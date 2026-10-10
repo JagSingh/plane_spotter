@@ -5,10 +5,10 @@
 # Override the location with the PLANE_SPOTTER_CONFIG environment variable.
 #
 # --- ADS-B input ---------------------------------------------------------
-# Written by dump1090-mutability on the host. dump1090 is NOT containerized
-# (it needs kernel driver blacklisting + udev rules); the container reads
-# this file over a read-only bind mount.
-dump1090_file: /var/run/dump1090-mutability/aircraft.json
+# Written by readsb on the host. readsb is NOT containerized (it needs kernel
+# driver blacklisting + udev rules); the container reads this file over a
+# read-only bind mount of /run/readsb.
+adsb_file: /run/readsb/aircraft.json
 
 # --- Monitored airspace --------------------------------------------------
 # The box that triggers a capture when an aircraft enters it.
