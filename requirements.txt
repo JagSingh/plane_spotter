@@ -15,7 +15,7 @@ torchvision==0.22.0+cpu
 ultralytics==8.3.124
 google-cloud-storage==3.1.0
 requests==2.32.3
-PyYAML==6.0.2
+PyYAML==6.0.3
  
 # opencv is NOT listed here. ultralytics pulls in opencv-python (the GUI
 # build). The Dockerfile replaces it with opencv-python-headless so the
