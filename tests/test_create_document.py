@@ -44,6 +44,7 @@ def test_update_html_file_creates_and_appends(mock_get, mock_gcs, mock_rebuild):
     blob = mock_gcs.bucket.return_value.blob
     assert blob.call_count == 2          # one upload per sighting
     blob.assert_called_with("planes_260712.html")
+    assert blob.return_value.cache_control == "no-cache"
 
     # All Days index is rebuilt once per day, on file creation only
     mock_rebuild.assert_called_once_with(extra=["planes_260712.html"])

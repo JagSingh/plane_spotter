@@ -80,6 +80,7 @@ def update_html_file(capture_time, airplane_data, airplane_picture):
 
     # Upload the file to Google Cloud Storage
     blob = gcs.bucket().blob(filename)
+    blob.cache_control = all_days.HTML_CACHE_CONTROL
     blob.upload_from_filename(file_path)
 
     # Once a day, after the new daily file is in the bucket, refresh the

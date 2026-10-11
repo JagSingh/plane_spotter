@@ -21,7 +21,12 @@ logger = logging.getLogger(__name__)
 ALL_DAYS_FILENAME = "all_days.html"
 DAILY_PREFIX = "planes_"
 DAILY_NAME_RE = re.compile(r"^planes_(\d{6})\.html$")
-DAILY_BASE_URL = "http://planes.jagmsingh.com/"
+# Relative links: the index works over whichever scheme served it
+# (http:// on plain GCS today, https:// once a TLS front end is in place).
+DAILY_BASE_URL = ""
+# HTML pages change through the day; make browsers/CDNs revalidate instead
+# of serving GCS's default 1-hour public cache.
+HTML_CACHE_CONTROL = "no-cache"
 
 _PAGE_HEAD = """<!DOCTYPE html>
 <html lang="en">
@@ -107,9 +112,9 @@ def rebuild(extra=()):
     file_path = os.path.join(get_config.log_dir, ALL_DAYS_FILENAME)
     with open(file_path, "w") as file:
         file.write(render(daily_names))
-    gcs.bucket().blob(ALL_DAYS_FILENAME).upload_from_filename(
-        file_path, content_type="text/html"
-    )
+    blob = gcs.bucket().blob(ALL_DAYS_FILENAME)
+    blob.cache_control = HTML_CACHE_CONTROL
+    blob.upload_from_filename(file_path, content_type="text/html")
     logger.info("Rebuilt %s with %d days", ALL_DAYS_FILENAME, len(daily_names))
 
 

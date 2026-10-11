@@ -37,8 +37,9 @@ def test_list_filters_sorts_and_merges_extra(mock_gcs):
 def test_render_is_static_and_skips_invalid_dates():
     html = all_days.render(["planes_261011.html", "planes_261399.html"])
     assert "<script" not in html
-    assert ('<li><a href="http://planes.jagmsingh.com/planes_261011.html">'
+    assert ('<li><a href="planes_261011.html">'
             "Oct 11, 2026</a></li>") in html
+    assert "http://" not in html
     assert "planes_261399" not in html
 
 
@@ -55,3 +56,4 @@ def test_rebuild_writes_and_uploads(mock_gcs):
     mock_gcs.bucket.return_value.blob.assert_called_with("all_days.html")
     upload = mock_gcs.bucket.return_value.blob.return_value.upload_from_filename
     upload.assert_called_once_with(path, content_type="text/html")
+    assert mock_gcs.bucket.return_value.blob.return_value.cache_control == "no-cache"
