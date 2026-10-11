@@ -33,7 +33,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
 # them at runtime (and works without egress).
 RUN python -c "from ultralytics import YOLO; YOLO('yolov8n.pt')"
 
-COPY get_config.py gcs.py capture_picture.py capture_radio_data.py create_document.py ./
+COPY get_config.py gcs.py capture_picture.py capture_radio_data.py create_document.py all_days.py ./
 
 # Non-root; the 'video' group grants /dev/video* access on Debian/Ubuntu hosts.
 # UID/GID must match the host owner of /var/lib/plane-spotter, or the

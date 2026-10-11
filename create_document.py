@@ -4,6 +4,7 @@ import os
 
 import requests
 
+import all_days
 import gcs
 import get_config
 
@@ -53,7 +54,8 @@ def update_html_file(capture_time, airplane_data, airplane_picture):
     logger.info("Airplane data: %s", print_airplane_data)
 
     # One HTML file per day; create it with the page header on first sighting.
-    if not os.path.exists(file_path):
+    new_day = not os.path.exists(file_path)
+    if new_day:
         with open(file_path, "w") as file:
             file.write(
                 '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'
@@ -79,6 +81,15 @@ def update_html_file(capture_time, airplane_data, airplane_picture):
     # Upload the file to Google Cloud Storage
     blob = gcs.bucket().blob(filename)
     blob.upload_from_filename(file_path)
+
+    # Once a day, after the new daily file is in the bucket, refresh the
+    # All Days index. A failure here must not lose the sighting already
+    # recorded; the next day's rebuild (or `python all_days.py`) catches up.
+    if new_day:
+        try:
+            all_days.rebuild(extra=[filename])
+        except Exception:
+            logger.exception("Failed to rebuild %s", all_days.ALL_DAYS_FILENAME)
 
 
 """
