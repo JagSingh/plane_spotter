@@ -10,7 +10,6 @@ README.md
 *.zip
 .venv
 venv
-all_days.html
 config.sample.yaml
 docker-compose.yml
 pyproject.toml

@@ -7,9 +7,10 @@ import create_document
 import get_config
 
 
+@patch("create_document.all_days.rebuild")
 @patch("create_document.gcs")
 @patch("create_document.requests.get")
-def test_update_html_file_creates_and_appends(mock_get, mock_gcs):
+def test_update_html_file_creates_and_appends(mock_get, mock_gcs, mock_rebuild):
     mock_get.return_value = MagicMock(
         status_code=200, json=lambda: {"Type": "MD-11 F"},
         raise_for_status=lambda: None)
@@ -43,6 +44,25 @@ def test_update_html_file_creates_and_appends(mock_get, mock_gcs):
     blob = mock_gcs.bucket.return_value.blob
     assert blob.call_count == 2          # one upload per sighting
     blob.assert_called_with("planes_260712.html")
+
+    # All Days index is rebuilt once per day, on file creation only
+    mock_rebuild.assert_called_once_with(extra=["planes_260712.html"])
+
+
+@patch("create_document.all_days.rebuild", side_effect=RuntimeError("gcs down"))
+@patch("create_document.gcs")
+@patch("create_document.requests.get")
+def test_all_days_failure_does_not_lose_sighting(mock_get, mock_gcs, mock_rebuild):
+    mock_get.return_value = MagicMock(
+        status_code=200, json=lambda: {"Type": "B738"},
+        raise_for_status=lambda: None)
+    capture_time = datetime(2026, 7, 13, 9, 0, 0)
+    create_document.update_html_file(capture_time, {"hex": "abc123"}, "x.jpg")
+
+    file_path = os.path.join(get_config.log_dir, "planes_260713.html")
+    assert "x.jpg" in open(file_path).read()
+    mock_gcs.bucket.return_value.blob.return_value.upload_from_filename \
+        .assert_called_once_with(file_path)
 
 
 @patch("create_document.requests.get")
