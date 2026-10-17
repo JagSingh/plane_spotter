@@ -193,7 +193,7 @@ docker compose up -d --force-recreate    # plane_spotter container: re-attach it
 Make sure readsb restarts by itself after a USB drop or re-enumeration:
 
 ```bash
-systemctl show readsb -p Restart -p RestartSec
+systemctl show readsb -p Restart -p RestartUSec
 ```
 
 The packaged unit ships with `Restart=always` and `RestartSec=15`. If the output
