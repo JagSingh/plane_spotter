@@ -185,8 +185,9 @@ sudo systemctl edit readsb
 RuntimeDirectoryPreserve=yes
 ```
 ```bash
-sudo systemctl restart readsb
-docker compose up -d --force-recreate    # pick up the stable directory
+sudo systemctl restart readsb            # readsb: systemd service on the host
+docker compose up -d --force-recreate    # plane_spotter container: re-attach its
+                                         # /run/readsb bind mount to the stable directory
 ```
 
 Make sure readsb restarts by itself after a USB drop or re-enumeration:
