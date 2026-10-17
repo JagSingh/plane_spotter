@@ -113,9 +113,9 @@ if data is not available:
     lat, lon: the aircraft position in decimal degrees
     seen_pos: how long ago (in seconds before "now") the position was last updated
     alt_baro: barometric altitude in feet, or "ground" if it is reporting
-        it is on the ground  (mutability: altitude)
-    gs: ground speed in knots  (mutability: speed)
-    baro_rate: barometric vertical rate in feet/minute  (mutability: vert_rate)
+        it is on the ground
+    gs: ground speed in knots
+    baro_rate: barometric vertical rate in feet/minute
     track: true track over ground in degrees (0-359)
     messages: total number of Mode S messages received from this aircraft
     seen: how long ago (in seconds before "now") a message was last received

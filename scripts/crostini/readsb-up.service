@@ -1,0 +1,14 @@
+# (c) jag.m.singh@gmail.com
+# Install: docs/receiver-setup.md §6.4
+[Unit]
+Description=Keep readsb alive across RTL-SDR replugs (Crostini)
+After=readsb.service network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/readsb-up.sh --watch
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

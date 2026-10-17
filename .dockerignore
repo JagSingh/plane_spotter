@@ -15,3 +15,5 @@ docker-compose.yml
 pyproject.toml
 MIGRATION.md
 requirements-dev.txt
+docs
+scripts

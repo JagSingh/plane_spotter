@@ -37,7 +37,7 @@ services:
       # Mount the DIRECTORY, not aircraft.json: readsb replaces the file by
       # rename every second, and a file bind mount pins the old inode.
       # The host needs RuntimeDirectoryPreserve=yes on readsb.service (see
-      # capture_radio_data.py), or every readsb restart deletes /run/readsb
+      # docs/receiver-setup.md §3), or every readsb restart deletes /run/readsb
       # and leaves this mount pointing at a dead directory.
       - /run/readsb:/run/readsb:ro
       # Config + GCS key, read-only. Identical path on both sides.
