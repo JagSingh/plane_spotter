@@ -60,10 +60,8 @@ Nooelec RTL-SDR (`0bda:2838`) on 2026-10-17.
 
 - The LNA takes its power from USB. Do not use a bias-tee, and do not pass
   `--enable-biastee` to readsb.
-- **Plug it into a laptop root port, never into the USB-C dock.** On 2026-10-12
-  the dock's USB2 hub chain (port `3-2`) dropped both the camera and the Nooelec
-  with `error -71`. The Pro Stick Plus draws more current than the Nooelec did.
-- The stick is a USB2 device, so it always enumerates on **bus 3** (the
+- Plug it into a laptop root port, not into the USB-C dock. The stick is a USB2 device,
+  so it always enumerates on **bus 3** (the
   high-speed companion root hub) and never on bus 4 (SuperSpeed). Check the
   **port path**, not the bus number. A path with no dot has no hub in between:
 
