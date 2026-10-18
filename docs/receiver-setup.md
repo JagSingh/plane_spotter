@@ -73,8 +73,7 @@ Nooelec RTL-SDR (`0bda:2838`) on 2026-10-17.
   # 3-2.1  480 Mb/s      bad:  behind the dock hub
   ```
 
-The same rule applies to the HD USB camera (`32e4:9230`). Move it off the dock
-too and check its path with `idProduct` = `9230`.
+The HD USB camera has its own setup doc: [camera-setup.md](camera-setup.md).
 
 ## 2. North laptop: drivers and udev
 
@@ -499,7 +498,7 @@ off. Then compare `ac_pos` and `ac_near`.
 
 | Symptom | Likely cause | Check / fix |
 |---|---|---|
-| `dmesg`: `error -71`, `Cannot enable` | Stick or camera behind the dock hub | §1 port path. Move to a root port |
+| `dmesg`: `error -71`, `Cannot enable` | Stick or camera behind the dock hub | §1 port path (camera: [camera-setup.md §2](camera-setup.md#2-connect-the-camera)). Move to a root port |
 | `usb_claim_interface error` | DVB driver owns the stick | §2 blacklist, `lsmod \| grep dvb` |
 | plane_spotter logs aircraft.json missing | readsb down, or a stale bind mount | `systemctl status readsb`. Check the `RuntimeDirectoryPreserve` drop-in |
 | strong % > 5 | Gain too high | Let autogain settle. If pinned, step down |
