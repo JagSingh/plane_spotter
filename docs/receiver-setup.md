@@ -345,6 +345,12 @@ handle. `readsb-up.sh --watch` detects this and repairs it.
 4. **Reserve the Chromebook's IP** (`192.168.86.218`) in the Google Home app.
    The north laptop's firewall rule in §4 depends on it.
 
+**Shortcut:** in the Chromebook's Linux Terminal, from any folder:
+`curl -fsSLO https://raw.githubusercontent.com/JagSingh/plane_spotter/main/scripts/crostini/install.sh && sudo bash install.sh --lat <lat> --lon <lon>`.
+It downloads the other three files from GitHub and runs §6.2–6.4. It is safe to
+re-run, and on a re-run it keeps the existing `/etc/default/readsb-up`. The manual
+steps follow.
+
 ### 6.2 Packages and readsb (in the Chromebook's Linux Terminal)
 
 ```bash
