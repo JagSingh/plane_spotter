@@ -318,8 +318,9 @@ Use this to cross-check autogain's choice:
 
 ## 6. South Chromebook (Crostini)
 
-The Chromebook runs readsb inside Crostini, ChromeOS's Debian Linux container. Its antenna sits at the south window. readsb runs there with fixed
-gain 36.4 and pushes Beast data to the north laptop using `--net-connector`.
+The Chromebook runs readsb inside Crostini, ChromeOS's Debian Linux container.
+Its antenna sits at the south window. readsb runs there with fixed gain 36.4 and
+pushes Beast data to the north laptop using `--net-connector`.
 [`scripts/crostini/readsb-up.sh`](../scripts/crostini/readsb-up.sh) supervises
 readsb.
 
@@ -342,53 +343,77 @@ handle. `readsb-up.sh --watch` detects this and repairs it.
    - **While charging → When idle: Turn off display** (not Sleep)
    - Leave it **plugged in**. The battery idle setting can still put it to
      sleep.
-4. **Reserve the Chromebook's IP** (`192.168.86.218`) in the Google Home app.
-   The north laptop's firewall rule in §4 depends on it.
+4. **Reserve the north laptop's IP** (`192.168.86.137`) in the Google Home app.
+   `FEED_HOST` points at it; if it changes, the feed stops. The Chromebook's own
+   address does not matter, because it connects outbound.
 
-**Shortcut:** in the Chromebook's Linux Terminal, from any folder:
-`curl -fsSLO https://raw.githubusercontent.com/JagSingh/plane_spotter/main/scripts/crostini/install.sh && sudo bash install.sh --lat <lat> --lon <lon>`.
-It downloads the other three files from GitHub and runs §6.2–6.4. It is safe to
-re-run, and on a re-run it keeps the existing `/etc/default/readsb-up`. The manual
-steps follow.
+### 6.2 Install (in the Chromebook's Linux Terminal)
 
-### 6.2 Packages and readsb (in the Chromebook's Linux Terminal)
+Choose **one** option.
+
+#### Option A: install.sh (recommended)
+
+From any folder:
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/JagSingh/plane_spotter/main/scripts/crostini/install.sh
+sudo bash install.sh --lat <lat> --lon <lon>
+```
+
+`install.sh` downloads the other three files from GitHub and does everything in
+Option B: packages, readsb, site settings and the readsb-up service. It is safe
+to re-run, and on a re-run it keeps the existing `/etc/default/readsb-up`.
+`--ref <branch|tag|sha>` pins what it downloads (default `main`).
+
+> **If you used Option A, you are done installing.** Skip the rest of §6.2,
+> all of §6.3, and the install commands in §6.4. Continue at
+> [Verify](#verify-both-options) in §6.4.
+
+#### Option B: manual install
+
+Packages and readsb:
 
 ```bash
 sudo apt update
-sudo apt install -y usbutils psmisc iproute2 procps jq rtl-sdr
+sudo apt install -y usbutils psmisc iproute2 procps jq rtl-sdr wget
 #   usbutils: lsusb   psmisc: fuser   procps: pidof   iproute2: ss
 #   rtl-sdr: rtl_test (optional; readsb-up.sh skips the probe without it)
+#   wget: the readsb installer below
 
 lsusb | grep -i rtl                      # dongle visible inside Crostini?
 
 sudo bash -c "$(wget -O - https://github.com/wiedehopf/adsb-scripts/raw/master/readsb-install.sh)"
 ```
 
-You don't need to blacklist modules here. The container has no kernel of its own, and
-the USB device arrives already forwarded. If the stick wedges, `readsb-up.sh`
-handles it with an `rtl_test` probe and a `USBDEVFS_RESET`.
+You don't need to blacklist modules here. The container has no kernel of its
+own, and the USB device arrives already forwarded. If the stick wedges,
+`readsb-up.sh` handles it with an `rtl_test` probe and a `USBDEVFS_RESET`.
 
-Do not hand-edit `RECEIVER_OPTIONS`, `DECODER_OPTIONS` or `NET_OPTIONS` in
-the Chromebook's `/etc/default/readsb`. `readsb-up.sh` owns those three lines and
+Do not hand-edit `RECEIVER_OPTIONS`, `DECODER_OPTIONS` or `NET_OPTIONS` in the
+Chromebook's `/etc/default/readsb`. `readsb-up.sh` owns those three lines and
 rewrites them on every recovery. Other lines are left as they are.
 
-### 6.3 Site settings
+### 6.3 Site settings (Option B only)
 
 The receiver location stays out of the repo. Put it in an env file that
-`readsb-up.sh` reads:
+`readsb-up.sh` reads. Run this from a checkout of this repo, or from a folder
+holding the files in `scripts/crostini/`:
 
 ```bash
 sudo install -m 0644 scripts/crostini/readsb-up.env.sample /etc/default/readsb-up
 sudo nano /etc/default/readsb-up         # set LAT and LON; check FEED_HOST
 ```
 
-Variables passed on the command line override the file, for example
-`sudo GAIN=40.2 ./readsb-up.sh`.
+Variables passed on the command line override the file for a one-off run, for
+example `sudo GAIN=40.2 /usr/local/bin/readsb-up.sh`. Stop the service first
+(`sudo systemctl stop readsb-up`), or the run exits with "another readsb-up is
+already running". The service uses the file's values on its next recovery, so
+put lasting changes in the file.
 
 ### 6.4 Install readsb-up as a service
 
-From a checkout of this repo in the Chromebook's Linux (or copy the three files from
-`scripts/crostini/` into Linux files):
+**Option B only.** From a checkout of this repo in the Chromebook's Linux, or
+from a folder holding the files in `scripts/crostini/`:
 
 ```bash
 sudo pkill -f readsb-up.sh               # stop any manual instance
@@ -399,7 +424,7 @@ sudo systemctl enable readsb
 sudo systemctl enable --now readsb-up
 ```
 
-Verify:
+#### Verify (both options)
 
 ```bash
 systemctl is-active readsb-up readsb     # both: active
@@ -417,8 +442,8 @@ readsb healthy — messages advancing
 ```
 
 **Replug test:** with the log open, unplug the dongle and plug it back in, and
-re-share it with Linux if ChromeOS asks. The log should show
-`dongle unplugged`, then `dongle detected — recovering`, then `healthy`.
+re-share it with Linux if ChromeOS asks. The log should show `dongle unplugged`,
+then `dongle detected — recovering`, then `healthy`.
 
 ### 6.5 What readsb-up.sh does
 
@@ -441,9 +466,9 @@ Each recovery attempt runs these steps:
 7. Start readsb.
 8. Verify from `/proc/<pid>/cmdline` that the running process has the gain,
    location and connector.
-9. Check that the feed to the north laptop is established. A missing link only produces a
-   warning, so the north laptop being down can't fail local recovery, and readsb reconnects on
-   its own.
+9. Check that the feed to the north laptop is established. A missing link only
+   produces a warning, so the north laptop being down can't fail local recovery,
+   and readsb reconnects on its own.
 10. Require the message counter to advance over 20 s.
 
 It makes 3 attempts and issues a USB reset before the last one.
@@ -457,14 +482,15 @@ ChromeOS doesn't start Linux until something opens it, and it has no setting to
 start Linux automatically. After any reboot, including one for an OS update:
 
 1. Log in and open **Terminal**. Pinning it to the shelf makes this quicker.
-   Opening it starts the Crostini container, and systemd then starts `readsb` and `readsb-up`.
+   Opening it starts the Crostini container, and systemd then starts `readsb`
+   and `readsb-up`.
 2. Re-share the dongle if ChromeOS asks.
-3. Confirm the feed from the north laptop:
+3. On the north laptop, confirm the feed is connected:
    `sudo ss -tn state established '( sport = :30004 )'`.
 
 If the feed dropped overnight, run `journalctl -u readsb-up --since "8 hours ago"`
-on the south Chromebook. The log shows whether the dongle went away (because of USB or sleep)
-or readsb stalled.
+on the Chromebook. The log shows whether the dongle went away (because of USB or
+sleep) or readsb stalled.
 
 ### 6.7 Feed protocol
 
