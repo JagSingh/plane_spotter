@@ -515,11 +515,14 @@ On the north laptop:
 systemctl status readsb
 journalctl -u readsb -n 50
 sudo ss -tn state established '( sport = :30004 )'     # 192.168.86.218 listed
+jq '.last1min.remote.accepted | add' /run/readsb/stats.json   # south feed msgs/min
 jq '[.aircraft[]|select(.lat)]|length' /run/readsb/aircraft.json
 ```
 
 On the feed connection, a small, transient `Recv-Q` is normal. If it keeps
-climbing, readsb is not keeping up.
+climbing, readsb is not keeping up. An established connection does not prove data is flowing. The `remote` count is
+the south Chromebook's messages over the last minute; expect tens of thousands
+(about 48k/min on 2026-10-19). 
 
 Message ratios do not measure unique-aircraft gain. To measure what the south Chromebook
 *adds*, run `antcmp.py` on the north laptop for 10 minutes with the feed on and 10 minutes
